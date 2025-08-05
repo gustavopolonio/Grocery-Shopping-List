@@ -1,7 +1,8 @@
 export default {
   translations: {
-    home: {
-      message: "Olá Mundo! {{name}}",
+    login: {
+      signup: "Crie uma conta",
+      login: "Log in",
     },
   },
 };
