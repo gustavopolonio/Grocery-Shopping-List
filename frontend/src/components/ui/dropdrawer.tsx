@@ -453,7 +453,7 @@ function DropDrawerItem({
         data-inset={inset}
         data-disabled={disabled}
         className={cn(
-          "bg-accent dark:bg-accent flex cursor-pointer items-center justify-between px-4 py-4",
+          "text-primary-foreground bg-primary dark:bg-primary flex cursor-pointer items-center justify-between px-4 py-6 h-12",
           // Only apply margin, background and rounded corners if not in a group
           !isInsideGroup && "bg-accent dark:bg-accent mx-2 my-1.5 rounded-md",
           // For items in a group, don't add background but add more padding
@@ -635,7 +635,7 @@ function DropDrawerGroup({
         data-drop-drawer-group
         data-slot="drop-drawer-group"
         role="group"
-        className={cn("mx-2 my-3 overflow-hidden rounded-xl", className)}
+        className={cn("mx-2 my-2 overflow-hidden rounded-xl", className)}
         {...props}
       >
         {childrenWithSeparators}

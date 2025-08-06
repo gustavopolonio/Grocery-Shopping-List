@@ -95,7 +95,7 @@ export function Header() {
               </DropDrawerLabel>
 
               <DropDrawerGroup>
-                <DropDrawerItem asChild className="p-0 h-9">
+                <DropDrawerItem asChild className="p-0 min-h-9">
                   <Link
                     to={`/${lang}/account`}
                     className="w-full px-2 py-1.5 cursor-pointer"
@@ -108,7 +108,7 @@ export function Header() {
               <DropDrawerSeparator />
 
               <DropDrawerGroup>
-                <DropDrawerItem asChild className="p-0 h-9">
+                <DropDrawerItem asChild className="p-0 min-h-9">
                   <Link
                     to={`/${lang}/items`}
                     className="w-full px-2 py-1.5 cursor-pointer"
@@ -116,7 +116,7 @@ export function Header() {
                     <Translator path="header.allItems" />
                   </Link>
                 </DropDrawerItem>
-                <DropDrawerItem asChild className="p-0 h-9">
+                <DropDrawerItem asChild className="p-0 min-h-9">
                   <Link
                     to={`/${lang}/dashboard/custom-items`}
                     className="w-full px-2 py-1.5 cursor-pointer"
@@ -130,7 +130,7 @@ export function Header() {
 
               {/* @to-do: just display this group if user is not PRO */}
               <DropDrawerGroup>
-                <DropDrawerItem asChild className="p-0 h-9">
+                <DropDrawerItem asChild className="p-0 min-h-9">
                   <Button
                     variant="ghost"
                     size="sm"
@@ -146,7 +146,7 @@ export function Header() {
               <DropDrawerSeparator />
 
               <DropDrawerGroup>
-                <DropDrawerItem asChild className="p-0 h-9">
+                <DropDrawerItem asChild className="p-0 min-h-9">
                   <Button
                     variant="ghost"
                     size="sm"
