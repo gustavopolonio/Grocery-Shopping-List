@@ -4,6 +4,7 @@ import { LogOut, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { Translator } from "@/lib/i18n/Translator";
 import { supabase } from "@/lib/supabase";
+import { localizedPath } from "@/utils";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -97,7 +98,7 @@ export function Header() {
               <DropDrawerGroup>
                 <DropDrawerItem asChild className="p-0 min-h-9">
                   <Link
-                    to={`/${lang}/account`}
+                    to={localizedPath("/account", lang)}
                     className="w-full px-2 py-1.5 cursor-pointer"
                   >
                     <Translator path="header.accountSettings" />
@@ -110,7 +111,7 @@ export function Header() {
               <DropDrawerGroup>
                 <DropDrawerItem asChild className="p-0 min-h-9">
                   <Link
-                    to={`/${lang}/items`}
+                    to={localizedPath("/items", lang)}
                     className="w-full px-2 py-1.5 cursor-pointer"
                   >
                     <Translator path="header.allItems" />
@@ -118,7 +119,7 @@ export function Header() {
                 </DropDrawerItem>
                 <DropDrawerItem asChild className="p-0 min-h-9">
                   <Link
-                    to={`/${lang}/dashboard/custom-items`}
+                    to={localizedPath("/dashboard/custom-items", lang)}
                     className="w-full px-2 py-1.5 cursor-pointer"
                   >
                     <Translator path="header.customItems" />
@@ -162,13 +163,13 @@ export function Header() {
           </DropDrawer>
         ) : isLoginPage ? (
           <Button asChild>
-            <Link to={`/${lang}/signup`}>
+            <Link to={localizedPath("/signup", lang)}>
               {<Translator path="auth.signup.title" />}
             </Link>
           </Button>
         ) : (
           <Button asChild>
-            <Link to={`/${lang}/login`}>
+            <Link to={localizedPath("/login", lang)}>
               {<Translator path="auth.login.title" />}
             </Link>
           </Button>

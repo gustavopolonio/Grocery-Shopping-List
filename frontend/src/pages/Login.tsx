@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router";
 import { toast } from "sonner";
 import { supabase } from "@/lib/supabase";
 import { Translator } from "@/lib/i18n/Translator";
+import { localizedPath } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { Typography } from "@/components/ui/typography";
 import GoogleIcon from "@/images/google.png";
@@ -45,7 +46,7 @@ export function Login() {
       <Typography variant="p">
         <Translator path="auth.noAccount" />{" "}
         <Button asChild variant="link" className="p-0">
-          <Link to={`/${lang}/signup`}>
+          <Link to={localizedPath("/signup", lang)}>
             <Translator path="auth.signup.title" />
           </Link>
         </Button>
