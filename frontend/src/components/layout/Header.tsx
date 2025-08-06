@@ -162,11 +162,15 @@ export function Header() {
           </DropDrawer>
         ) : isLoginPage ? (
           <Button asChild>
-            <Link to="/signup">{<Translator path="auth.signup.title" />}</Link>
+            <Link to={`/${lang}/signup`}>
+              {<Translator path="auth.signup.title" />}
+            </Link>
           </Button>
         ) : (
           <Button asChild>
-            <Link to="/login">{<Translator path="auth.login.title" />}</Link>
+            <Link to={`/${lang}/login`}>
+              {<Translator path="auth.login.title" />}
+            </Link>
           </Button>
         )}
       </div>
