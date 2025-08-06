@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router";
 import { LogOut, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { Translator } from "@/lib/i18n/Translator";
 import { supabase } from "@/lib/supabase";
 import { localizedPath } from "@/utils";
+import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -19,13 +19,11 @@ import {
   DropDrawerLabel,
   DropDrawerSeparator,
 } from "@/components/ui/dropdrawer";
-import type { User } from "@supabase/supabase-js";
 
 export function Header() {
   const { pathname } = useLocation();
   const { lang } = useParams();
-  const [user, setUser] = useState<User | null>(null);
-  const [isGettingUser, setIsGettingUser] = useState(true);
+  const { user, isLoadingUser } = useAuth();
 
   async function signOut() {
     const { error } = await supabase.auth.signOut();
@@ -35,28 +33,8 @@ export function Header() {
       return;
     }
 
-    setUser(null);
+    window.location.replace("/");
   }
-
-  useEffect(() => {
-    async function getSession() {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-
-        if (error) {
-          throw error;
-        }
-
-        setUser(data.user);
-      } catch {
-        setUser(null);
-      } finally {
-        setIsGettingUser(false);
-      }
-    }
-
-    getSession();
-  }, []);
 
   const isLoginPage = pathname.endsWith("/login");
 
@@ -67,7 +45,7 @@ export function Header() {
           <Logo />
         </Link>
 
-        {isGettingUser ? (
+        {isLoadingUser ? (
           <Skeleton className="w-8 h-8 rounded-full" />
         ) : user ? (
           <DropDrawer>
