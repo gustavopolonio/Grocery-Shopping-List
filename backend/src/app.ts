@@ -7,7 +7,7 @@ import { prisma } from "@/lib/prisma";
 const app = express();
 
 app.use(
-  "/auth/*",
+  "/auth/*routes",
   ExpressAuth({
     providers: [],
     adapter: PrismaAdapter(prisma),
