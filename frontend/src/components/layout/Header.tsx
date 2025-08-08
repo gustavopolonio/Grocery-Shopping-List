@@ -2,9 +2,7 @@ import { Link, useLocation, useParams } from "react-router";
 import { LogOut, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { Translator } from "@/lib/i18n/Translator";
-import { supabase } from "@/lib/supabase";
 import { localizedPath } from "@/utils";
-import { useAuth } from "@/hooks/useAuth";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -23,18 +21,17 @@ import {
 export function Header() {
   const { pathname } = useLocation();
   const { lang } = useParams();
-  const { user, isLoadingUser } = useAuth();
 
-  async function signOut() {
-    const { error } = await supabase.auth.signOut();
+  // async function signOut() {
+  //   const { error } = await supabase.auth.signOut();
 
-    if (error) {
-      toast.error(<Translator path="auth.logout.fail" />);
-      return;
-    }
+  //   if (error) {
+  //     toast.error(<Translator path="auth.logout.fail" />);
+  //     return;
+  //   }
 
-    window.location.replace("/");
-  }
+  //   window.location.replace("/");
+  // }
 
   const isLoginPage = pathname.endsWith("/login");
 
@@ -130,7 +127,7 @@ export function Header() {
                     variant="ghost"
                     size="sm"
                     className="group cursor-pointer w-full justify-start focus-visible:border-none focus-visible:ring-0"
-                    onClick={signOut}
+                    // onClick={signOut}
                   >
                     <Translator path="auth.logout.title" />
                     <LogOut className="group-hover:text-accent-foreground" />

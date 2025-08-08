@@ -2,7 +2,6 @@ import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { toast } from "sonner";
-import { supabase } from "@/lib/supabase";
 import { Translator } from "@/lib/i18n/Translator";
 import { localizedPath } from "@/utils";
 import { Button } from "@/components/ui/button";

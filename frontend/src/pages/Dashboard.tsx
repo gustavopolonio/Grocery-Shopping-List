@@ -2,15 +2,12 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "sonner";
 import { Translator } from "@/lib/i18n/Translator";
-import { supabase } from "@/lib/supabase";
-import { useAuth } from "@/hooks/useAuth";
 import { getFirstName, getGreeting } from "@/utils";
 import { Button } from "@/components/ui/button";
 import DraggableList from "@/components/ui/draggable-list";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Typography } from "@/components/ui/typography";
 import WavingHandIcon from "@/images/waving-hand.png";
-import type { Tables } from "supabase";
 import {
   CardAction,
   CardContent,
@@ -25,7 +22,6 @@ import {
 } from "@/components/ui/avatar";
 
 export function Dashboard() {
-  const { user, isLoadingUser } = useAuth();
   const { t } = useTranslation();
   const [lists, setLists] = useState<Tables<"lists">[]>([]);
 
