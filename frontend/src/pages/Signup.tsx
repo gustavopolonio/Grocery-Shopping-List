@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useState } from "react";
 import { Link, useParams } from "react-router";
 import { toast } from "sonner";
@@ -11,6 +12,7 @@ import GoogleIcon from "@/images/google.png";
 export function Signup() {
   const [isSigningUp, setIsSigningUp] = useState(false);
   const { lang } = useParams();
+  const { t } = useTranslation();
 
   async function handleSignup() {
     setIsSigningUp(true);
@@ -39,7 +41,11 @@ export function Signup() {
         loading={isSigningUp}
         disabled={isSigningUp}
       >
-        <img className="w-5" src={GoogleIcon} alt="Google" />
+        <img
+          className="w-5"
+          src={GoogleIcon}
+          alt={t("auth.providers.google")}
+        />
         <Translator path="auth.google" />
       </Button>
 
