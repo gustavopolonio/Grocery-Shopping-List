@@ -18,6 +18,7 @@ model User {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  profile   Profile?
 }
 
 model Account {
@@ -57,4 +58,160 @@ model VerificationToken {
   expires    DateTime
 
   @@id([identifier, token])
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  usernamme String
+  avatarUrl String?
+  planId    String
+  createdAt DateTime @default(now())
+
+  plan              Plan                @relation(fields: [planId], references: [id])
+  user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  list              List[]
+  listMember        ListMember[]
+  userCustomProduct UserCustomProduct[]
+  listItem          ListItem[]
+  invitesCreated    ListInvite[]        @relation("CreatedByProfile")
+  invitesUsed       ListInvite[]        @relation("UsedByProfile")
+  listInvite        ListInvite[]
+}
+
+model Plan {
+  id                     String   @id @default(uuid())
+  name                   PlanName
+  maxListsUserCanBe      Int
+  maxItemsPerList        Int
+  maxCustomItemsPerUser  Int
+  maxUsersPerList        Int
+  whisperMinutesPerMonth Int
+
+  profile Profile[]
+}
+
+model List {
+  id        String   @id @default(uuid())
+  name      String
+  ownerId   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  owner      Profile      @relation(fields: [ownerId], references: [id])
+  listMember ListMember[]
+  listItem   ListItem[]
+  listInvite ListInvite[]
+}
+
+model ListMember {
+  listId    String
+  userId    String
+  role      ListRole @default(MEMBER)
+  createdAt DateTime @default(now())
+
+  list    List    @relation(fields: [listId], references: [id])
+  profile Profile @relation(fields: [userId], references: [id])
+
+  @@id([listId, userId])
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  icon        String
+  defaultName String
+  createdAt   DateTime @default(now())
+
+  categoryTranslation CategoryTranslation[]
+}
+
+model CategoryTranslation {
+  name       String
+  language   Language
+  categoryId String
+  createdAt  DateTime @default(now())
+
+  category Category @relation(fields: [categoryId], references: [id])
+
+  @@id([categoryId, language])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  icon        String
+  defaultName String
+  createdAt   DateTime @default(now())
+
+  productTranslation ProductTranslation[]
+  listItem           ListItem[]
+}
+
+model ProductTranslation {
+  name      String
+  language  Language
+  productId String
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@id([productId, language])
+}
+
+model UserCustomProduct {
+  id        String   @id @default(uuid())
+  name      String
+  icon      String?
+  createdBy String
+  createdAt DateTime @default(now())
+
+  profile  Profile    @relation(fields: [createdBy], references: [id])
+  listItem ListItem[]
+}
+
+model ListItem {
+  id              String   @id @default(uuid())
+  listId          String
+  addedBy         String
+  productId       String?
+  customProductId String?
+  quantity        Int      @default(1)
+  note            String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  list          List               @relation(fields: [listId], references: [id], onDelete: Cascade)
+  addedByUser   Profile            @relation(fields: [addedBy], references: [id], onDelete: Cascade)
+  product       Product?           @relation(fields: [productId], references: [id], onDelete: Cascade)
+  customProduct UserCustomProduct? @relation(fields: [customProductId], references: [id], onDelete: Cascade)
+}
+
+model ListInvite {
+  id        String    @id @default(uuid())
+  listId    String
+  createdBy String
+  usedBy    String
+  token     String    @unique
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+
+  list          List     @relation(fields: [listId], references: [id], onDelete: Cascade)
+  createdByUser Profile  @relation("CreatedByProfile", fields: [createdBy], references: [id], onDelete: Cascade)
+  usedByUser    Profile  @relation("UsedByProfile", fields: [usedBy], references: [id], onDelete: Cascade)
+  profile       Profile? @relation(fields: [profileId], references: [id])
+  profileId     String?
+}
+
+enum PlanName {
+  FREE
+  PRO
+}
+
+enum ListRole {
+  OWNER
+  MEMBER
+}
+
+enum Language {
+  ptBR
+  enUS
 }
