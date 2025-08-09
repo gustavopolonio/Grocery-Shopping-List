@@ -10,7 +10,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "prisma-seed:dev": "tsx prisma/seed.ts",
+    "prisma-seed:prod": "prisma db seed"
   },
   "keywords": [],
   "author": "",
