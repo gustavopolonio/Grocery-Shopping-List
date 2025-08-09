@@ -81,12 +81,12 @@ model Profile {
 
 model Plan {
   id                     String   @id @default(uuid())
-  name                   PlanName
-  maxListsUserCanBe      Int
-  maxItemsPerList        Int
-  maxCustomItemsPerUser  Int
-  maxUsersPerList        Int
-  whisperMinutesPerMonth Int
+  name                   PlanName @unique
+  maxListsUserCanBe      Int?
+  maxItemsPerList        Int?
+  maxCustomItemsPerUser  Int?
+  maxUsersPerList        Int?
+  whisperMinutesPerMonth Int?
 
   profile Profile[]
 }
@@ -119,7 +119,7 @@ model ListMember {
 model Category {
   id          String   @id @default(uuid())
   icon        String
-  defaultName String
+  defaultName String   @unique
   createdAt   DateTime @default(now())
 
   categoryTranslation CategoryTranslation[]
@@ -139,7 +139,7 @@ model CategoryTranslation {
 model Product {
   id          String   @id @default(uuid())
   icon        String
-  defaultName String
+  defaultName String   @unique
   createdAt   DateTime @default(now())
 
   productTranslation ProductTranslation[]
