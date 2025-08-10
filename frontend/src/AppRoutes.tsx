@@ -1,11 +1,22 @@
+import { useClerk } from "@clerk/clerk-react";
 import { Route, Routes } from "react-router";
 import { Login } from "@/pages/Login";
 import { Signup } from "@/pages/Signup";
 import { Dashboard } from "@/pages/Dashboard";
 import { Layout } from "@/components/layout/Layout";
 import { PageContainer } from "@/components/layout/PageContainer";
+import { Spinner } from "@/components/ui/spinner";
 
 export function AppRoutes() {
+  const { loaded } = useClerk();
+
+  if (!loaded)
+    return (
+      <div className="h-screen flex items-center justify-center">
+        <Spinner className="text-primary" />
+      </div>
+    );
+
   return (
     <Routes>
       <Route path="/" element={<Layout />}>

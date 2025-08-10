@@ -1,37 +1,23 @@
-import { Link, useLocation, useParams } from "react-router";
-import { LogOut, TrendingUp } from "lucide-react";
-import { toast } from "sonner";
+import {
+  SignedIn,
+  SignedOut,
+  UserButton,
+  ClerkLoading,
+} from "@clerk/clerk-react";
+import { useTranslation } from "react-i18next";
+import { Link, useLocation, useNavigate, useParams } from "react-router";
+import { ListCheck, Pencil, TrendingUp } from "lucide-react";
 import { Translator } from "@/lib/i18n/Translator";
 import { localizedPath } from "@/utils";
 import { Logo } from "@/components/ui/logo";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Typography } from "@/components/ui/typography";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  DropDrawer,
-  DropDrawerContent,
-  DropDrawerItem,
-  DropDrawerTrigger,
-  DropDrawerGroup,
-  DropDrawerLabel,
-  DropDrawerSeparator,
-} from "@/components/ui/dropdrawer";
 
 export function Header() {
   const { pathname } = useLocation();
+  const navigate = useNavigate();
   const { lang } = useParams();
-
-  // async function signOut() {
-  //   const { error } = await supabase.auth.signOut();
-
-  //   if (error) {
-  //     toast.error(<Translator path="auth.logout.fail" />);
-  //     return;
-  //   }
-
-  //   window.location.replace("/");
-  // }
+  const { t } = useTranslation();
 
   const isLoginPage = pathname.endsWith("/login");
 
@@ -42,113 +28,53 @@ export function Header() {
           <Logo />
         </Link>
 
-        {isLoadingUser ? (
+        <ClerkLoading>
           <Skeleton className="w-8 h-8 rounded-full" />
-        ) : user ? (
-          <DropDrawer>
-            <DropDrawerTrigger asChild>
-              <Button variant="ghost" className="p-0 rounded-full">
-                <Avatar>
-                  <AvatarImage
-                    src={user.user_metadata.avatar_url}
-                    alt={user.user_metadata.name}
-                  />
-                  <AvatarFallback>
-                    {user.user_metadata.name.slice(0, 2)}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropDrawerTrigger>
+        </ClerkLoading>
 
-            <DropDrawerContent>
-              <DropDrawerLabel>
-                <Typography variant="p" className="font-bold leading-6">
-                  {user.user_metadata.full_name}
-                </Typography>
-                <Typography variant="p" className="leading-6">
-                  {user.email}
-                </Typography>
-              </DropDrawerLabel>
+        <SignedIn>
+          <UserButton>
+            <UserButton.MenuItems>
+              <UserButton.Action
+                label={t("header.allItems")}
+                labelIcon={<ListCheck size={16} />}
+                onClick={() => navigate(localizedPath("/items", lang))}
+              />
 
-              <DropDrawerGroup>
-                <DropDrawerItem asChild className="p-0 min-h-9">
-                  <Link
-                    to={localizedPath("/account", lang)}
-                    className="w-full px-2 py-1.5 cursor-pointer"
-                  >
-                    <Translator path="header.accountSettings" />
-                  </Link>
-                </DropDrawerItem>
-              </DropDrawerGroup>
-
-              <DropDrawerSeparator />
-
-              <DropDrawerGroup>
-                <DropDrawerItem asChild className="p-0 min-h-9">
-                  <Link
-                    to={localizedPath("/items", lang)}
-                    className="w-full px-2 py-1.5 cursor-pointer"
-                  >
-                    <Translator path="header.allItems" />
-                  </Link>
-                </DropDrawerItem>
-                <DropDrawerItem asChild className="p-0 min-h-9">
-                  <Link
-                    to={localizedPath("/dashboard/custom-items", lang)}
-                    className="w-full px-2 py-1.5 cursor-pointer"
-                  >
-                    <Translator path="header.customItems" />
-                  </Link>
-                </DropDrawerItem>
-              </DropDrawerGroup>
-
-              <DropDrawerSeparator />
+              <UserButton.Action
+                label={t("header.customItems")}
+                labelIcon={<Pencil size={16} />}
+                onClick={() =>
+                  navigate(localizedPath("/dashboard/custom-items", lang))
+                }
+              />
 
               {/* @to-do: just display this group if user is not PRO */}
-              <DropDrawerGroup>
-                <DropDrawerItem asChild className="p-0 min-h-9">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="group cursor-pointer w-full justify-start focus-visible:border-none focus-visible:ring-0"
-                    // onClick={} @to-do: open plan modal
-                  >
-                    <Translator path="header.becomePro" />
-                    <TrendingUp className="group-hover:text-accent-foreground" />
-                  </Button>
-                </DropDrawerItem>
-              </DropDrawerGroup>
+              <UserButton.Action
+                label={t("header.becomePro")}
+                labelIcon={<TrendingUp size={16} />}
+                // onClick={} @to-do: open plan modal
+                onClick={() => alert("Plan modal")}
+              />
+            </UserButton.MenuItems>
+          </UserButton>
+        </SignedIn>
 
-              <DropDrawerSeparator />
-
-              <DropDrawerGroup>
-                <DropDrawerItem asChild className="p-0 min-h-9">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="group cursor-pointer w-full justify-start focus-visible:border-none focus-visible:ring-0"
-                    // onClick={signOut}
-                  >
-                    <Translator path="auth.logout.title" />
-                    <LogOut className="group-hover:text-accent-foreground" />
-                  </Button>
-                </DropDrawerItem>
-              </DropDrawerGroup>
-            </DropDrawerContent>
-          </DropDrawer>
-        ) : isLoginPage ? (
-          <Button asChild>
-            <Link to={localizedPath("/signup", lang)}>
-              {<Translator path="auth.signup.title" />}
-            </Link>
-          </Button>
-        ) : (
-          <Button asChild>
-            <Link to={localizedPath("/login", lang)}>
-              {<Translator path="auth.login.title" />}
-            </Link>
-          </Button>
-        )}
+        <SignedOut>
+          {isLoginPage ? (
+            <Button asChild>
+              <Link to={localizedPath("/signup", lang)}>
+                {<Translator path="auth.signup.title" />}
+              </Link>
+            </Button>
+          ) : (
+            <Button asChild>
+              <Link to={localizedPath("/login", lang)}>
+                {<Translator path="auth.login.title" />}
+              </Link>
+            </Button>
+          )}
+        </SignedOut>
       </div>
     </header>
   );

@@ -1,17 +1,36 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { ClerkProvider } from "@clerk/clerk-react";
+import { ptBR, enUS } from "@clerk/localizations";
 import { Toaster } from "sonner";
-import { BrowserRouter } from "react-router";
+import { BrowserRouter, useLocation } from "react-router";
+import { localizedPath } from "@/utils";
 import { AppRoutes } from "@/AppRoutes";
 import "./lib/i18n";
 
 const queryClient = new QueryClient();
 
+function ClerkWithLang() {
+  const location = useLocation();
+  const firstSegment = location.pathname.split("/")[1];
+  const lang = firstSegment.toLocaleLowerCase() === "pt-br" ? "pt-BR" : "en-US";
+
+  return (
+    <ClerkProvider
+      publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
+      localization={lang === "pt-BR" ? ptBR : enUS}
+      afterSignOutUrl={localizedPath("/", lang)}
+    >
+      <AppRoutes />
+      <Toaster richColors position="top-right" closeButton />
+    </ClerkProvider>
+  );
+}
+
 export function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AppRoutes />
-        <Toaster richColors position="top-right" closeButton />
+        <ClerkWithLang />
       </BrowserRouter>
     </QueryClientProvider>
   );
