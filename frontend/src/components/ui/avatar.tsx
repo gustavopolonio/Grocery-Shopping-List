@@ -59,7 +59,8 @@ function AvatarGroup({ children, max, className, ...props }: AvatarGroupProps) {
   const displayedAvatars = React.Children.toArray(children)
     .slice(0, max)
     .reverse();
-  const remainingAvatars = max ? Math.max(totalAvatars - max, 1) : 0;
+  const remainingAvatars = max ? Math.max(totalAvatars - max, 0) : 0;
+
   return (
     <div
       className={cn("flex items-center flex-row-reverse", className)}
