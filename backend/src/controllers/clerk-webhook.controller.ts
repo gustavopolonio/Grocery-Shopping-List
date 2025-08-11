@@ -59,6 +59,35 @@ export async function handleClerkWebhook(req: Request, res: Response) {
         res.status(200).json({ message: "Webhook received - profile deleted" });
         break;
       }
+
+      case "user.updated": {
+        const { id: userId, first_name, last_name, image_url } = evt.data;
+        const fullName = `${first_name} ${last_name}`;
+
+        const profile = await prisma.profile.findUnique({
+          where: {
+            clerkUserId: userId,
+          },
+        });
+
+        if (!profile) {
+          res.status(404).send({ message: "Profile not found" });
+          return;
+        }
+
+        await prisma.profile.update({
+          where: {
+            clerkUserId: userId,
+          },
+          data: {
+            username: fullName,
+            avatarUrl: image_url,
+          },
+        });
+
+        res.status(200).json({ message: "Webhook received - profile updated" });
+        break;
+      }
     }
 
     return;
