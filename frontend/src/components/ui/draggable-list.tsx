@@ -1,17 +1,17 @@
-import { type Dispatch, type ReactNode, type SetStateAction } from "react";
+import { type ReactNode } from "react";
 import { Reorder } from "framer-motion";
 import DraggableItem from "@/components/ui/draggable-item";
 
 interface DraggableListProps<T> {
   items: T[];
-  setItems: Dispatch<SetStateAction<T[]>>;
+  onReorder: (lists: T[]) => void;
   getId: (item: T) => string;
   renderItem: (item: T) => ReactNode;
 }
 
 export default function DraggableList<T>({
   items,
-  setItems,
+  onReorder,
   getId,
   renderItem,
 }: DraggableListProps<T>) {
@@ -20,11 +20,11 @@ export default function DraggableList<T>({
       <Reorder.Group
         axis="y"
         values={items}
-        onReorder={setItems}
+        onReorder={onReorder}
         className="space-y-4"
       >
         {items.map((item) => (
-          <DraggableItem key={getId(item)} item={item}>
+          <DraggableItem key={getId(item)} item={item} itemId={getId(item)}>
             {renderItem(item)}
           </DraggableItem>
         ))}

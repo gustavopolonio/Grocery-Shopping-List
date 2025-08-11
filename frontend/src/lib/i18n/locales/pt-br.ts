@@ -12,8 +12,10 @@ export default {
     dashboard: {
       lists: {
         add: "Criar lista",
-        title: "Suas listas",
         fail: "Falha ao carregar suas listas, por favor tente novamente.",
+        item: "item",
+        items: "itens",
+        title: "Suas listas",
       },
     },
     greeting: {
