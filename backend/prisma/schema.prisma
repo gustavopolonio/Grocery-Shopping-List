@@ -127,8 +127,9 @@ model UserCustomProduct {
   createdBy String
   createdAt DateTime @default(now())
 
-  profile  Profile    @relation(fields: [createdBy], references: [id])
-  listItem ListItem[]
+  profile                   Profile                     @relation(fields: [createdBy], references: [id])
+  listItem                  ListItem[]
+  userCustomProductCategory UserCustomProductCategory[]
 
   @@map("userCustomProducts")
 }
@@ -149,8 +150,10 @@ model UserCustomProductCategory {
   categoryId          String
   createdAt           DateTime @default(now())
 
-  userCustomProduct Product  @relation(fields: [userCustomProductId], references: [id], onDelete: Cascade)
-  category          Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  userCustomProduct UserCustomProduct @relation(fields: [userCustomProductId], references: [id], onDelete: Cascade)
+  category          Category          @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  Product           Product?          @relation(fields: [productId], references: [id])
+  productId         String?
 
   @@id([userCustomProductId, categoryId])
 }
