@@ -75,7 +75,9 @@ model Category {
   defaultName String   @unique
   createdAt   DateTime @default(now())
 
-  categoryTranslation CategoryTranslation[]
+  categoryTranslation       CategoryTranslation[]
+  productCategory           ProductCategory[]
+  userCustomProductCategory UserCustomProductCategory[]
 
   @@map("categories")
 }
@@ -98,8 +100,10 @@ model Product {
   defaultName String   @unique
   createdAt   DateTime @default(now())
 
-  productTranslation ProductTranslation[]
-  listItem           ListItem[]
+  productTranslation        ProductTranslation[]
+  listItem                  ListItem[]
+  productCategory           ProductCategory[]
+  userCustomProductCategory UserCustomProductCategory[]
 
   @@map("products")
 }
@@ -127,6 +131,28 @@ model UserCustomProduct {
   listItem ListItem[]
 
   @@map("userCustomProducts")
+}
+
+model ProductCategory {
+  productId  String
+  categoryId String
+  createdAt  DateTime @default(now())
+
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([productId, categoryId])
+}
+
+model UserCustomProductCategory {
+  userCustomProductId String
+  categoryId          String
+  createdAt           DateTime @default(now())
+
+  userCustomProduct Product  @relation(fields: [userCustomProductId], references: [id], onDelete: Cascade)
+  category          Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([userCustomProductId, categoryId])
 }
 
 model ListItem {
