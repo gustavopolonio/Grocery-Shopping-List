@@ -6,6 +6,7 @@ import { env } from "@/env";
 import { clerkWebhooksRoutes } from "@/routes/webhooks/clerk.route";
 import { usersRoutes } from "@/routes/users.routes";
 import { itemsRoutes } from "@/routes/items.routes";
+import { listsRoutes } from "@/routes/lists.routes";
 import { verifyAuth } from "@/middlewares/verify-auth";
 
 const app = express();
@@ -16,10 +17,12 @@ app.use(
     credentials: true,
   })
 );
+app.use(express.json());
 app.use(clerkMiddleware({}));
 
 app.use("/api/webhooks", clerkWebhooksRoutes);
 app.use("/users/me", verifyAuth, usersRoutes);
+app.use("/lists", verifyAuth, listsRoutes);
 app.use("{/:lang}/category-items", itemsRoutes);
 
 app.listen(env.PORT, () => {
