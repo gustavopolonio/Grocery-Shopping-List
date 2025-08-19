@@ -29,6 +29,7 @@ function ClerkWithLang() {
       publishableKey={import.meta.env.VITE_CLERK_PUBLISHABLE_KEY}
       localization={lang === "pt-BR" ? ptBR : enUS}
       afterSignOutUrl={localizedPath("/", lang)}
+      appearance={{ cssLayerName: "clerk" }}
     >
       <AppRoutes />
       <Toaster richColors position="top-right" closeButton />

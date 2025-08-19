@@ -33,7 +33,13 @@ export function Header() {
         </ClerkLoading>
 
         <SignedIn>
-          <UserButton>
+          <UserButton
+            appearance={{
+              elements: {
+                avatarBox: "w-9! h-9!",
+              },
+            }}
+          >
             <UserButton.MenuItems>
               <UserButton.Action
                 label={t("header.allItems")}
