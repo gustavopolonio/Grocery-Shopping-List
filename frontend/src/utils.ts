@@ -28,3 +28,11 @@ export function pluralize(
 ): string {
   return count === 1 ? singular : plural;
 }
+
+export function capitalizeFirstLetter(text: string) {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+export function removeAccentsAndDiacritics(text: string) {
+  return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}

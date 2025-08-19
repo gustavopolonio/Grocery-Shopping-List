@@ -4,7 +4,7 @@ import { useUser } from "@clerk/clerk-react";
 import { useAxiosPrivate } from "@/hooks/useAxiosPrivate";
 import { Translator } from "@/lib/i18n/Translator";
 import { getFirstName, getGreeting, pluralize } from "@/utils";
-import { Button } from "@/components/ui/button";
+import { CreateListDialog } from "@/components/layout/CreateListDialog";
 import DraggableList from "@/components/ui/draggable-list";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Typography } from "@/components/ui/typography";
@@ -69,9 +69,7 @@ export function Dashboard() {
             <Translator path="dashboard.lists.title" />
           </Typography>
 
-          <Button className="font-bold">
-            + <Translator path="dashboard.lists.add" />
-          </Button>
+          <CreateListDialog />
         </div>
 
         <div className="max-w-2xl mx-auto">
