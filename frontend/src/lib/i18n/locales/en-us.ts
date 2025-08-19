@@ -21,6 +21,7 @@ export default {
           fail: "Error loading items, try refreshing the page.",
           noItems: "No items found!",
         },
+        fail: "Failed to create list",
         fields: {
           listItems: {
             placeholder: "Search for item...",
@@ -33,6 +34,8 @@ export default {
           },
         },
         submit: "Create list",
+        submitting: "Creating...",
+        success: "List created",
         summary: {
           items: "Items",
           quantity: "Qty",

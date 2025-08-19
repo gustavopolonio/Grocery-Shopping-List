@@ -21,6 +21,7 @@ export default {
           fail: "Falha ao carregar os itens, tente recarregar a página.",
           noItems: "Nenhum item encontrado!",
         },
+        fail: "Falha ao criar lista",
         fields: {
           listItems: {
             placeholder: "Procure por item...",
@@ -33,6 +34,8 @@ export default {
           },
         },
         submit: "Criar lista",
+        submitting: "Criando...",
+        success: "Lista criada",
         summary: {
           items: "Itens",
           quantity: "Qtd",

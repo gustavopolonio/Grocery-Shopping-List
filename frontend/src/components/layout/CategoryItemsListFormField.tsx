@@ -63,6 +63,7 @@ export function CategoryItemsListFormField({
             notes: "",
             name: product.name,
             icon: product.icon,
+            isCustom: "false",
           }));
 
           const customProducts = category.userCustomProducts.map(
@@ -72,6 +73,7 @@ export function CategoryItemsListFormField({
               notes: "",
               name: customProduct.name,
               icon: customProduct.icon,
+              isCustom: "true",
             })
           );
 

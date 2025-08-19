@@ -1,8 +1,12 @@
 import z from "zod";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { Link, PlusIcon } from "lucide-react";
+import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAxiosPrivate } from "@/hooks/useAxiosPrivate";
 import { Translator } from "@/lib/i18n/Translator";
 import { CategoryItemsListFormField } from "@/components/layout/CategoryItemsListFormField";
 import { CreateListSummary } from "@/components/layout/CreateListSummary";
@@ -24,6 +28,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import type { List } from "@/@types/list";
 
 const itemFieldSchema = z.object({
   itemId: z.string(),
@@ -31,6 +36,7 @@ const itemFieldSchema = z.object({
   name: z.string().min(2),
   icon: z.string(),
   note: z.string().optional(),
+  isCustom: z.string(),
 });
 
 const createListFormSchema = z.object({
@@ -45,6 +51,10 @@ export type CreateListFormValues = z.infer<typeof createListFormSchema>;
 
 export function CreateListDialog() {
   const { t } = useTranslation();
+  const axiosPrivate = useAxiosPrivate();
+  const queryClient = useQueryClient();
+  const [isCreateListDialogOpen, setIsCreateListDialogOpen] = useState(false);
+
   const createListForm = useForm<CreateListFormValues>({
     resolver: zodResolver(createListFormSchema),
     defaultValues: {
@@ -53,13 +63,54 @@ export function CreateListDialog() {
     },
   });
 
+  const createListMutation = useMutation({
+    mutationFn: async (newListData: CreateListFormValues) => {
+      const newListDataFormatted = {
+        ...newListData,
+        listItems: newListData.listItems
+          .filter((item) => item.quantity > 0)
+          .map((item) => ({
+            ...item,
+            isCustom: item.isCustom === "true",
+          })),
+      };
+
+      const response = await axiosPrivate.post("/lists", newListDataFormatted);
+      return response.data;
+    },
+    onSuccess(data: { newList: List }) {
+      queryClient.setQueryData<{ lists: List[] }>(
+        ["auth-user-lists"],
+        (oldData) => {
+          if (!oldData)
+            return {
+              lists: [data.newList],
+            };
+
+          return {
+            lists: [...oldData.lists, data.newList],
+          };
+        }
+      );
+
+      setIsCreateListDialogOpen(false);
+      createListForm.reset();
+      toast.success(t("dashboard.createListDialog.success"));
+    },
+    onError() {
+      toast.error(t("dashboard.createListDialog.fail"));
+    },
+  });
+
   function onCreateList(values: CreateListFormValues) {
-    console.log(values);
-    // @to-do: create list
+    createListMutation.mutate(values);
   }
 
   return (
-    <Dialog>
+    <Dialog
+      open={isCreateListDialogOpen}
+      onOpenChange={setIsCreateListDialogOpen}
+    >
       <DialogTrigger asChild>
         <Button className="font-bold">
           <PlusIcon />
@@ -118,11 +169,12 @@ export function CreateListDialog() {
                 </AlertDescription>
               </Alert>
 
-              <Button
-                type="submit"
-                // disabled when creating list @to-do
-              >
-                <Translator path="dashboard.createListDialog.submit" />
+              <Button type="submit" disabled={createListMutation.isPending}>
+                <Translator
+                  path={`dashboard.createListDialog.${
+                    createListMutation.isPending ? "submitting" : "submit"
+                  }`}
+                />
               </Button>
             </div>
           </form>

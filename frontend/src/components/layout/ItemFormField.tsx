@@ -52,6 +52,11 @@ export function ItemFormField({
     name: `${name}.${index}.icon`,
   });
 
+  const { field: isCutomField } = useController({
+    control,
+    name: `${name}.${index}.isCustom`,
+  });
+
   useEffect(() => {
     if (isNoteCollapsibleOpen && noteInputRef.current) {
       noteInputRef.current.focus();
@@ -93,6 +98,8 @@ export function ItemFormField({
         <Input type="hidden" value={nameField.value} />
 
         <Input type="hidden" value={iconField.value} />
+
+        <Input type="hidden" value={isCutomField.value ? "true" : "false"} />
       </li>
 
       <CollapsibleContent>
