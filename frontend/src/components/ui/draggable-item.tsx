@@ -7,11 +7,9 @@ import { Button } from "@/components/ui/button";
 
 interface DraggableItemProps<T> {
   item: T;
-  itemId: string
+  itemId: string;
   children: ReactNode;
 }
-
-// @to-do: check if in prod drag/drop works. When drag first item down and try to drag it up again should work.
 
 export default function DraggableItem<T>({
   item,
@@ -40,6 +38,7 @@ export default function DraggableItem<T>({
       style={{
         cursor: "default",
         display: "flex",
+        touchAction: "none",
       }}
       dragListener={false}
       dragControls={controls}
