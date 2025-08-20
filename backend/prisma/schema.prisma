@@ -62,8 +62,8 @@ model ListMember {
   role      ListRole @default(MEMBER)
   createdAt DateTime @default(now())
 
-  list    List    @relation(fields: [listId], references: [id])
-  profile Profile @relation(fields: [profileId], references: [id])
+  list    List    @relation(fields: [listId], references: [id], onDelete: Cascade)
+  profile Profile @relation(fields: [profileId], references: [id], onDelete: Cascade)
 
   @@id([listId, profileId])
   @@map("listMembers")
@@ -88,7 +88,7 @@ model CategoryTranslation {
   categoryId String
   createdAt  DateTime @default(now())
 
-  category Category @relation(fields: [categoryId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([categoryId, language])
   @@map("categoryTranslations")
@@ -127,7 +127,7 @@ model UserCustomProduct {
   createdBy String
   createdAt DateTime @default(now())
 
-  profile                   Profile                     @relation(fields: [createdBy], references: [id])
+  profile                   Profile                     @relation(fields: [createdBy], references: [id], onDelete: Cascade)
   listItem                  ListItem[]
   userCustomProductCategory UserCustomProductCategory[]
 
@@ -189,7 +189,7 @@ model ListInvite {
   list          List     @relation(fields: [listId], references: [id], onDelete: Cascade)
   createdByUser Profile  @relation("CreatedByProfile", fields: [createdBy], references: [id], onDelete: Cascade)
   usedByUser    Profile  @relation("UsedByProfile", fields: [usedBy], references: [id], onDelete: Cascade)
-  profile       Profile? @relation(fields: [profileId], references: [id])
+  profile       Profile? @relation(fields: [profileId], references: [id], onDelete: Cascade)
   profileId     String?
 
   @@map("listInvites")
