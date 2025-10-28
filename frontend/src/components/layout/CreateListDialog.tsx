@@ -35,7 +35,7 @@ const itemFieldSchema = z.object({
   quantity: z.number().min(0),
   name: z.string().min(2),
   icon: z.string(),
-  note: z.string().optional(),
+  note: z.string().optional().nullable(),
   isCustom: z.string(),
 });
 

@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { useController, type Control } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { Edit3 } from "lucide-react";
+import { Clock, Edit3 } from "lucide-react";
 import type { CreateListFormValues } from "@/components/layout/CreateListDialog";
 import { Typography } from "@/components/ui/typography";
-import { capitalizeFirstLetter } from "@/utils";
+import { capitalizeFirstLetter, formatToMonthDay } from "@/utils";
 import { Button } from "@/components/ui/button";
 import { QuantitySelector } from "@/components/ui/quantity-selector";
 import { Input } from "@/components/ui/input";
@@ -19,14 +19,25 @@ type ItemFormFieldProps = {
   index: number;
   product: Item;
   control: Control<CreateListFormValues>;
+  onRemove?: () => void;
   name: "listItems";
+  displayCreatedAt?: boolean;
+  listFilters?: {
+    categoryIcons: boolean;
+    itemIcons: boolean;
+    addedBy: boolean;
+    createdAt: boolean;
+  };
 };
 
 export function ItemFormField({
   index,
   product,
   control,
+  onRemove,
   name,
+  displayCreatedAt = false,
+  listFilters,
 }: ItemFormFieldProps) {
   const noteInputRef = useRef<HTMLInputElement>(null);
   const [isNoteCollapsibleOpen, setIsNoteCollapsibleOpen] = useState(false);
@@ -63,37 +74,60 @@ export function ItemFormField({
     }
   }, [isNoteCollapsibleOpen]);
 
+  const showItemIcon = listFilters ? listFilters.itemIcons : true;
+
   return (
     <Collapsible
       key={product.id}
       open={isNoteCollapsibleOpen}
       onOpenChange={setIsNoteCollapsibleOpen}
     >
-      <li className="flex items-center justify-between bg-sidebar rounded-md group border overflow-hidden rounded-b-none gap-1">
-        <div className="w-0 flex-auto flex items-center gap-2 group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground">
-          <Typography className="leading-9! pl-1 text-sm font-bold max-md:leading-11! overflow-x-auto whitespace-nowrap">
-            {product.icon} {capitalizeFirstLetter(product.name)}
-          </Typography>
+      <li className="overflow-hidden ">
+        <div className="group rounded-md border flex items-center justify-between bg-sidebar rounded-b-none gap-1">
+          <div className="w-0 flex-auto flex items-center gap-2 group-hover:bg-sidebar-accent group-hover:text-sidebar-accent-foreground">
+            <Typography className="leading-9! pl-1 text-sm font-bold max-md:leading-11! overflow-x-auto whitespace-nowrap">
+              {showItemIcon && product.icon}{" "}
+              {capitalizeFirstLetter(product.name)}
+            </Typography>
 
-          <CollapsibleTrigger asChild>
-            <Button
-              size="icon"
-              variant="ghost"
-              type="button"
-              className="group/button hover:bg-primary relative max-md:w-11 max-md:h-11"
-            >
-              <Edit3 className="text-primary group-hover/button:text-primary-foreground max-md:w-5! max-md:h-5!" />
-              {noteField.value && (
-                <span className="absolute top-1/2 right-[-3px] -translate-y-1/2 h-2 w-2 rounded-full bg-blue-600"></span>
-              )}
-            </Button>
-          </CollapsibleTrigger>
+            <CollapsibleTrigger asChild>
+              <Button
+                size="icon"
+                variant="ghost"
+                type="button"
+                className="group/button hover:bg-primary relative max-md:w-11 max-md:h-11"
+              >
+                <Edit3 className="text-primary group-hover/button:text-primary-foreground max-md:w-5! max-md:h-5!" />
+                {noteField.value && (
+                  <span className="absolute top-1/2 right-[-3px] -translate-y-1/2 h-2 w-2 rounded-full bg-blue-600"></span>
+                )}
+              </Button>
+            </CollapsibleTrigger>
+          </div>
+
+          <QuantitySelector
+            quantity={quantityField.value ?? 0}
+            onChange={(val) => quantityField.onChange(val)}
+            onRemove={onRemove}
+          />
         </div>
 
-        <QuantitySelector
-          quantity={quantityField.value ?? 0}
-          onChange={(val) => quantityField.onChange(val)}
-        />
+        {displayCreatedAt &&
+          (listFilters?.addedBy || listFilters?.createdAt) && (
+            <div className="flex items-center p-1">
+              {listFilters?.addedBy && (
+                <span className="text-sm">by {product.addedBy}</span>
+              )}
+              {listFilters?.createdAt && (
+                <div className="flex items-center gap-1.5 ml-auto">
+                  <Clock size={16} />
+                  <span className="text-sm">
+                    {formatToMonthDay(product.createdAt).toLowerCase()}
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
 
         <Input type="hidden" value={nameField.value} />
 
@@ -108,7 +142,7 @@ export function ItemFormField({
           placeholder={t("dashboard.createListDialog.fields.listItems.note")}
           className="rounded-t-none max-md:h-10"
           value={noteField.value ?? ""}
-          onChange={(e) => noteField.onChange(e.target.value)}
+          onChange={(e) => noteField.onChange(e.target.value || null)}
         />
       </CollapsibleContent>
     </Collapsible>

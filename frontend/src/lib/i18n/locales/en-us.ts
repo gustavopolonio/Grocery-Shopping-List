@@ -9,6 +9,7 @@ export default {
         title: "Sign Up",
       },
     },
+    // to-do
     dashboard: {
       createListDialog: {
         alerts: {

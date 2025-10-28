@@ -34,6 +34,7 @@ export function Dashboard() {
     isError: isListsError,
     isPending: isListsPending,
   } = useQuery({
+    staleTime: 1000 * 60 * 60, // 1 hour
     queryKey: ["auth-user-lists"],
     queryFn: async (): Promise<{ lists: List[] }> => {
       const response = await axiosPrivate.get(

@@ -208,7 +208,7 @@ export async function createList(req: Request, res: Response) {
   const itemFieldSchema = z.object({
     itemId: z.uuid(),
     quantity: z.number().min(1),
-    note: z.string().optional(),
+    note: z.string().optional().nullable(),
     isCustom: z.boolean().optional().default(false),
   });
 
@@ -221,61 +221,227 @@ export async function createList(req: Request, res: Response) {
 
   const { listName, listItems } = createListBodySchema.parse(req.body);
 
-  const profile = await prisma.profile.findUnique({
-    where: {
-      clerkUserId,
-    },
-  });
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: {
+        clerkUserId,
+      },
+    });
 
-  if (!profile) {
-    res.status(404).send({ message: "User profile not found" });
+    if (!profile) {
+      res.status(404).send({ message: "User profile not found" });
+      return;
+    }
+
+    const newList = await prisma.list.create({
+      data: {
+        name: listName,
+        ownerId: profile.id,
+        listMember: {
+          create: {
+            profileId: profile.id,
+            role: "OWNER",
+          },
+        },
+        listItem: {
+          create: listItems.map((item) => ({
+            addedBy: profile.id,
+            quantity: item.quantity,
+            note: item.note,
+            ...(item.isCustom
+              ? {
+                  customProductId: item.itemId,
+                }
+              : {
+                  productId: item.itemId,
+                }),
+          })),
+        },
+      },
+    });
+
+    const newListFormatted = {
+      id: newList.id,
+      name: newList.name,
+      listMember: [
+        {
+          profile: {
+            id: profile.id,
+            username: profile.username,
+            avatarUrl: profile.avatarUrl,
+          },
+        },
+      ],
+      itemsCount: listItems.length,
+    };
+
+    res.status(201).json({ newList: newListFormatted });
+    return;
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(400).send({ message: error });
+      return;
+    }
+    res.status(500).send({ message: "Unknown error" });
     return;
   }
+}
 
-  const newList = await prisma.list.create({
-    data: {
-      name: listName,
-      ownerId: profile.id,
-      listMember: {
-        create: {
-          profileId: profile.id,
-          role: "OWNER",
-        },
-      },
-      listItem: {
-        create: listItems.map((item) => ({
-          addedBy: profile.id,
-          quantity: item.quantity,
-          note: item.note,
-          ...(item.isCustom
-            ? {
-                customProductId: item.itemId,
-              }
-            : {
-                productId: item.itemId,
-              }),
-        })),
-      },
-    },
+export async function updateList(req: Request, res: Response) {
+  const clerkUserId = req.clerkUserId;
+
+  const getListParamsSchema = z.object({
+    // lang: z
+    //   .string()
+    //   .optional()
+    //   .default("en-US")
+    //   .transform((val) =>
+    //     val.toLocaleLowerCase() === "pt-br" ? "ptBR" : "enUS"
+    //   ),
+    listId: z.uuid(),
   });
 
-  const newListFormatted = {
-    id: newList.id,
-    name: newList.name,
-    listMember: [
-      {
-        profile: {
-          id: profile.id,
-          username: profile.username,
-          avatarUrl: profile.avatarUrl,
-        },
-      },
-    ],
-    itemsCount: listItems.length,
-  };
+  const { listId } = getListParamsSchema.parse(req.params);
+
+  const itemFieldSchema = z.object({
+    itemId: z.uuid(),
+    quantity: z.number().min(1),
+    note: z.string().optional(),
+    isCustom: z.boolean().optional().default(false),
+  });
+
+  const updateListBodySchema = z.object({
+    listName: z
+      .string()
+      .min(3, { error: "List name must be at least 3 caracters" })
+      .optional(),
+    listItems: z.array(itemFieldSchema).optional(),
+  });
+
+  const { listName, listItems } = updateListBodySchema.parse(req.body);
 
   try {
-    res.status(201).json({ newList: newListFormatted });
+    const list = await prisma.list.findUnique({
+      where: {
+        id: listId,
+        listMember: {
+          some: {
+            profile: { clerkUserId },
+          },
+        },
+      },
+    });
+
+    if (!list) {
+      res.status(404).json({ message: "List not found" });
+      return;
+    }
+
+    const profile = await prisma.profile.findUnique({
+      where: { clerkUserId },
+      select: { id: true },
+    });
+
+    if (!profile) {
+      res.status(404).send({ message: "Profile not found" });
+      return;
+    }
+
+    if (listName) {
+      await prisma.list.update({
+        where: { id: listId },
+        data: { name: listName },
+      });
+    }
+
+    if (listItems) {
+      const existingListItems = await prisma.listItem.findMany({
+        where: { listId },
+        select: {
+          id: true,
+          productId: true,
+          customProductId: true,
+        },
+      });
+
+      const existingListItemsMap = new Map<string, string>();
+
+      existingListItems.map((listItem) => {
+        const itemId = listItem.productId || listItem.customProductId;
+        if (itemId) existingListItemsMap.set(itemId, listItem.id);
+      });
+
+      const incomingItemIds = new Set(
+        listItems.map((listItem) => listItem.itemId)
+      );
+
+      const toCreate = listItems.filter(
+        (i) => !existingListItemsMap.has(i.itemId)
+      );
+      const toUpdate = listItems.filter((i) =>
+        existingListItemsMap.has(i.itemId)
+      );
+      const toDelete = [...existingListItemsMap.keys()].filter(
+        (itemId) => !incomingItemIds.has(itemId)
+      );
+
+      const transactionResults = await prisma.$transaction([
+        // Create new items
+        ...toCreate.map((item) =>
+          prisma.listItem.create({
+            data: {
+              listId,
+              addedBy: profile.id,
+              ...(item.isCustom
+                ? {
+                    customProductId: item.itemId,
+                  }
+                : {
+                    productId: item.itemId,
+                  }),
+              quantity: item.quantity,
+              note: item.note,
+            },
+          })
+        ),
+
+        // Update changed items
+        ...toUpdate.map((item) =>
+          prisma.listItem.update({
+            where: { id: existingListItemsMap.get(item.itemId) },
+            data: {
+              quantity: item.quantity,
+              note: item.note,
+            },
+          })
+        ),
+
+        // Delete removed items
+        ...toDelete.map((itemId) =>
+          prisma.listItem.delete({
+            where: { id: existingListItemsMap.get(itemId) },
+          })
+        ),
+      ]);
+
+      const createdItems = transactionResults.slice(0, toCreate.length);
+      const updatedItems = transactionResults.slice(
+        toCreate.length,
+        toCreate.length + toUpdate.length
+      );
+      const deletedItems = transactionResults.slice(
+        toCreate.length + toUpdate.length
+      );
+
+      res.json({
+        listName: listName || list.name,
+        createdItems,
+        updatedItems,
+        deletedItems,
+      });
+    }
+
+    res.status(200);
     return;
   } catch (error) {
     if (error instanceof Error) {

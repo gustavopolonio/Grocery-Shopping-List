@@ -1,4 +1,5 @@
-import type { Profile } from "./profile";
+import type { Category } from "@/@types/item";
+import type { Profile } from "@/@types/profile";
 
 export type List = {
   id: string;
@@ -9,4 +10,9 @@ export type List = {
 
 type ListMember = {
   profile: Profile;
+};
+
+export type ListItems = {
+  list: List;
+  categories: Category[];
 };

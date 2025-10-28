@@ -1,3 +1,6 @@
+import { format } from "date-fns";
+import { enUS, ptBR } from "date-fns/locale";
+
 export function localizedPath(path: string, lang?: string) {
   return lang && lang.toLocaleLowerCase() !== "en-us"
     ? `/${lang}${path}`
@@ -35,4 +38,17 @@ export function capitalizeFirstLetter(text: string) {
 
 export function removeAccentsAndDiacritics(text: string) {
   return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+export function formatToMonthDay(
+  date: string | Date,
+  locale: "en" | "pt" = "en"
+) {
+  const parsedDate = typeof date === "string" ? new Date(date) : date;
+  const locales = {
+    en: enUS,
+    pt: ptBR,
+  };
+
+  return format(parsedDate, "MMMM d", { locale: locales[locale] });
 }

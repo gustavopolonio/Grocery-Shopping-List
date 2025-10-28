@@ -4,11 +4,27 @@ import { Button } from "@/components/ui/button";
 type QuantitySelectorPros = {
   quantity: number;
   onChange: (newQuantity: number) => void;
+  onRemove?: () => void;
 };
 
-export function QuantitySelector({ quantity, onChange }: QuantitySelectorPros) {
+export function QuantitySelector({
+  quantity,
+  onChange,
+  onRemove,
+}: QuantitySelectorPros) {
   function handleRemoveQuantity() {
-    onChange(Math.max(0, quantity - 1));
+    const newQuantity = Math.max(0, quantity - 1);
+
+    if (!onRemove) {
+      onChange(newQuantity);
+      return;
+    }
+
+    if (newQuantity === 0) {
+      onRemove();
+    } else {
+      onChange(newQuantity);
+    }
   }
 
   function handleIncreaseQuantity() {
